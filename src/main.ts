@@ -481,7 +481,7 @@ export class InstanceWatcher extends utils.Adapter {
             await this.setObjectNotExistsAsync('info', { type: 'channel', common: { name: 'All adapter instances' }, native: {} });
             await this.setObjectNotExistsAsync('info.notOperatingCount', { type: 'state', common: { name: 'Counter: Enabled but not functioning instances', type: 'number', role: 'info', read: true, write: false, def: 0 }, native: {} });
             await this.setObjectNotExistsAsync('info.notOperatingList', { type: 'state', common: { name: 'List: Enabled but not functioning instances', type: 'array', role: 'info', read: true, write: false, def: '[]' }, native: {} });
-            await this.setObjectNotExistsAsync('info.updatedDate', { type: 'state', common: { name: 'List: Enabled but not functioning instances', type: 'number', role: 'date', read: true, write: false, def: 0 }, native: {} });
+            await this.setObjectNotExistsAsync('info.updatedDate', { type: 'state', common: { name: 'Last update', type: 'number', role: 'date', read: true, write: false, def: 0 }, native: {} });
 
             // Create adapter instance device and state objects
             for (const id of this._inst.list) {
