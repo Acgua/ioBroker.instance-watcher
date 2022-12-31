@@ -1,0 +1,91 @@
+{
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "eslint.enable": true,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[typescript]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
+    "json.schemas": [
+        {
+            "fileMatch": ["io-package.json"],
+            "url": "https://json.schemastore.org/io-package"
+        }
+    ],
+    // Extension "TODO Highlight"
+    "todohighlight.keywords": [
+        {
+            "text": "TODO:",
+            "color": "white",
+            "backgroundColor": "#febd42",
+            "overviewRulerColor": "#febd42",
+            "border": "1px solid #febd42",
+            "borderRadius": "3px",
+            "isWholeLine": false
+        },
+        {
+            "text": "TODO :",
+            "color": "white",
+            "backgroundColor": "#febd42",
+            "overviewRulerColor": "#febd42",
+            "border": "1px solid #febd42",
+            "borderRadius": "3px",
+            "isWholeLine": true
+        },
+        {
+            "text": "FIXME:",
+            "color": "white",
+            "backgroundColor": "#ef6391",
+            "overviewRulerColor": "#ef6391",
+            "border": "1px solid #ef6391",
+            "borderRadius": "3px",
+            "isWholeLine": false
+        },
+        {
+            "text": "XXX:",
+            "color": "red",
+            "backgroundColor": "rgba(0,0,0,.2)",
+            "overviewRulerColor": "yellow",
+            "border": "1px solid red",
+            "borderRadius": "3px",
+            "isWholeLine": false
+        },
+        {
+            "text": "NOTE:",
+            "color": "black",
+            "backgroundColor": "yellow",
+            "overviewRulerColor": "yellow",
+            "border": "1px solid #ffffff",
+            "borderRadius": "3px",
+            "isWholeLine": false
+        },
+        {
+            "text": "NOTE :",
+            "color": "white",
+            "backgroundColor": "#0FAA71",
+            "overviewRulerColor": "#0FAA71",
+            "border": "1px solid #0FAA71",
+            "borderRadius": "3px",
+            "isWholeLine": true
+        },
+        {
+            "text": "|DEBUG|",
+            "color": "#000000",
+            "backgroundColor": "#72848A",
+            "overviewRulerColor": "#72848A",
+            "border": "1px solid #72848A",
+            "borderRadius": "3px",
+            "isWholeLine": true
+        },
+        {
+            "text": "attention:",
+            "color": "white",
+            "backgroundColor": "red",
+            "border": "1px solid red",
+            "borderRadius": "3px",
+            "isWholeLine": false
+        }
+    ]
+}
