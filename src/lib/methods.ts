@@ -71,6 +71,18 @@ export function err2Str(error: any): string {
 }
 
 /**
+ * Convert date/time to a local ISO string
+ * Required as toISOString() uses UTC +0 (Zulu) as time zone.
+ * https://stackoverflow.com/questions/10830357/
+ * @param   date    Date object
+ * @returns string like "2015-01-26T06:40:36.181"
+ */
+export function dateToLocalIsoString(date: Date): string {
+    const timezoneOffset = date.getTimezoneOffset() * 60000; //offset in milliseconds
+    return new Date(date.getTime() - timezoneOffset).toISOString().slice(0, -1);
+}
+
+/**
  * Checks if an operand (variable, constant, object, ...) is considered as empty.
  * - empty:     undefined; null; string|array|object, stringified and only with white space(s), and/or `><[]{}`
  * - NOT empty: not matching anything above; any function; boolean false; number -1

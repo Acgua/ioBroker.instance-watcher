@@ -18,6 +18,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var methods_exports = {};
 __export(methods_exports, {
   asyncInstanceOnOff: () => asyncInstanceOnOff,
+  dateToLocalIsoString: () => dateToLocalIsoString,
   err2Str: () => err2Str,
   getPreviousCronRun: () => getPreviousCronRun,
   isEmpty: () => isEmpty,
@@ -80,6 +81,10 @@ function err2Str(error) {
     return JSON.stringify(error);
   }
 }
+function dateToLocalIsoString(date) {
+  const timezoneOffset = date.getTimezoneOffset() * 6e4;
+  return new Date(date.getTime() - timezoneOffset).toISOString().slice(0, -1);
+}
 function isEmpty(toCheck) {
   if (toCheck === null || typeof toCheck === "undefined")
     return true;
@@ -116,6 +121,7 @@ function getPreviousCronRun(expression) {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   asyncInstanceOnOff,
+  dateToLocalIsoString,
   err2Str,
   getPreviousCronRun,
   isEmpty,

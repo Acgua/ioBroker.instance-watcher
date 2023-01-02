@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["../../src/lib/interfaces.ts"],
-  "sourcesContent": ["export interface IInstance {\n    // static information\n    id: string; // e.g. 'sonos.0'\n\n    // rather static information\n    mode: 'none' | 'daemon' | 'subscribe' | 'schedule' | 'once' | 'extension';\n    schedule?: string;\n\n    // dynamic information\n    enabled: true | false;\n    alive?: true | false;\n    connected_with_host?: true | false;\n    connected_with_device_service?: true | false;\n    isOperating?: true | false;\n\n    // for asyncUpdateQueue()\n    _recentChange: number; // last change (Date.now()) of: enabled, alive, connected_with_host, connected_with_device_service\n    _noUpdate: true | false; // for recursive function\n}\n"],
+  "sourcesContent": ["export interface IInstance {\n    // static information\n    id: string; // e.g. 'sonos.0'\n\n    // rather static information\n    mode: 'none' | 'daemon' | 'subscribe' | 'schedule' | 'once' | 'extension';\n    schedule?: string;\n\n    // dynamic information\n    enabled: true | false;\n    alive?: true | false;\n    connected_with_host?: true | false;\n    connected_with_device_service?: true | false;\n    isOperating?: true | false;\n\n    // for asyncUpdateQueue()\n    _recentChange: number; // last change (Date.now()) of: enabled, alive, connected_with_host, connected_with_device_service\n    _noUpdate: true | false; // for recursive function\n}\n\nexport interface ILog {\n    date: string;\n    instance: string;\n    status: 'operating' | 'not operating' | 'turned off';\n    timestamp: number;\n}\n"],
   "mappings": ";;;;;;;;;;;;;AAAA;AAAA;",
   "names": []
 }

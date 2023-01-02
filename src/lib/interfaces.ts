@@ -17,3 +17,10 @@ export interface IInstance {
     _recentChange: number; // last change (Date.now()) of: enabled, alive, connected_with_host, connected_with_device_service
     _noUpdate: true | false; // for recursive function
 }
+
+export interface ILog {
+    date: string;
+    instance: string;
+    status: 'operating' | 'not operating' | 'turned off';
+    timestamp: number;
+}
