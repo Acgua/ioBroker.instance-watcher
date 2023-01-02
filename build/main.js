@@ -316,9 +316,9 @@ class InstanceWatcher extends utils.Adapter {
   }
   async updateOperatingStates(what) {
     try {
-      await this.setStateAsync("info.enabledNotOperatingCount", { val: this._inst.enabledNotOperatingList.length, ack: true });
-      await this.setStateAsync("info.enabledNotOperatingList", { val: JSON.stringify(this._inst.enabledNotOperatingList), ack: true });
-      await this.setStateAsync("info.enabledNotOperatingLog", { val: JSON.stringify(this._inst.enabledNotOperatingLog), ack: true });
+      await this.setStateChangedAsync("info.enabledNotOperatingCount", { val: this._inst.enabledNotOperatingList.length, ack: true });
+      await this.setStateChangedAsync("info.enabledNotOperatingList", { val: JSON.stringify(this._inst.enabledNotOperatingList), ack: true });
+      await this.setStateChangedAsync("info.enabledNotOperatingLog", { val: JSON.stringify(this._inst.enabledNotOperatingLog), ack: true });
       await this.setStateAsync("info.updatedDate", { val: Date.now(), ack: true });
       let list = [];
       if (what === "all") {
@@ -424,7 +424,7 @@ class InstanceWatcher extends utils.Adapter {
   async createObjectsAsync() {
     try {
       await this.setObjectNotExistsAsync("instances", { type: "channel", common: { name: "ioBroker adapter instances" }, native: {} });
-      await this.setObjectNotExistsAsync("info", { type: "channel", common: { name: "All adapter instances" }, native: {} });
+      await this.setObjectNotExistsAsync("info", { type: "channel", common: { name: "Information (all adapter instances)" }, native: {} });
       await this.setObjectNotExistsAsync("info.enabledNotOperatingCount", { type: "state", common: { name: "Counter: Enabled but not functioning instances", type: "number", role: "info", read: true, write: false, def: 0 }, native: {} });
       await this.setObjectNotExistsAsync("info.enabledNotOperatingList", { type: "state", common: { name: "List: Enabled but not functioning instances", type: "array", role: "info", read: true, write: false, def: "[]" }, native: {} });
       await this.setObjectNotExistsAsync("info.enabledNotOperatingLog", { type: "state", common: { name: "Log of enabled but not functioning instances", type: "string", role: "json", read: true, write: false, def: "[]" }, native: {} });

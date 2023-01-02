@@ -294,7 +294,7 @@ export class InstanceWatcher extends utils.Adapter {
             // Add only under certain conditions
             let addToLog = false;
             if (previousStatus === '' && what === 'not operating') addToLog = true; // no previous log, just add non-operating.
-            if (previousStatus !== '' && previousStatus !== what) addToLog = true; // new status came in; don't ad
+            if (previousStatus !== '' && previousStatus !== what) addToLog = true; // new status came in
             if (addToLog) {
                 const logLine: ILog = {
                     date: this.dateToLocalIsoString(new Date()),
@@ -386,9 +386,9 @@ export class InstanceWatcher extends utils.Adapter {
      */
     private async updateOperatingStates(what: string): Promise<void> {
         try {
-            await this.setStateAsync('info.enabledNotOperatingCount', { val: this._inst.enabledNotOperatingList.length, ack: true });
-            await this.setStateAsync('info.enabledNotOperatingList', { val: JSON.stringify(this._inst.enabledNotOperatingList), ack: true });
-            await this.setStateAsync('info.enabledNotOperatingLog', { val: JSON.stringify(this._inst.enabledNotOperatingLog), ack: true });
+            await this.setStateChangedAsync('info.enabledNotOperatingCount', { val: this._inst.enabledNotOperatingList.length, ack: true });
+            await this.setStateChangedAsync('info.enabledNotOperatingList', { val: JSON.stringify(this._inst.enabledNotOperatingList), ack: true });
+            await this.setStateChangedAsync('info.enabledNotOperatingLog', { val: JSON.stringify(this._inst.enabledNotOperatingLog), ack: true });
             await this.setStateAsync('info.updatedDate', { val: Date.now(), ack: true });
 
             let list: Array<string> = [];
@@ -527,7 +527,7 @@ export class InstanceWatcher extends utils.Adapter {
         try {
             // Creating main channel and state objects
             await this.setObjectNotExistsAsync('instances', { type: 'channel', common: { name: 'ioBroker adapter instances' }, native: {} });
-            await this.setObjectNotExistsAsync('info', { type: 'channel', common: { name: 'All adapter instances' }, native: {} });
+            await this.setObjectNotExistsAsync('info', { type: 'channel', common: { name: 'Information (all adapter instances)' }, native: {} });
             await this.setObjectNotExistsAsync('info.enabledNotOperatingCount', { type: 'state', common: { name: 'Counter: Enabled but not functioning instances', type: 'number', role: 'info', read: true, write: false, def: 0 }, native: {} });
             await this.setObjectNotExistsAsync('info.enabledNotOperatingList', { type: 'state', common: { name: 'List: Enabled but not functioning instances', type: 'array', role: 'info', read: true, write: false, def: '[]' }, native: {} });
             await this.setObjectNotExistsAsync('info.enabledNotOperatingLog', { type: 'state', common: { name: 'Log of enabled but not functioning instances', type: 'string', role: 'json', read: true, write: false, def: '[]' }, native: {} });
