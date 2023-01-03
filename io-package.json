@@ -13,10 +13,10 @@
                 "it": "Versione iniziale",
                 "es": "Versión inicial",
                 "pl": "Pierwsze wydanie",
+                "uk": "initial release",
                 "zh-cn": "首次出版"
             }
         },
-        "title": "Instance Watcher",
         "titleLang": {
             "en": "Instance Watcher",
             "de": "Instance Watcher",
@@ -27,6 +27,7 @@
             "it": "Osservatore di istanze",
             "es": "Vigilante de instancias",
             "pl": "Obserwator instancji",
+            "uk": "Instance Watcher",
             "zh-cn": "实例观察者"
         },
         "desc": {
@@ -39,10 +40,11 @@
             "it": "Watchdog per le istanze dell'adattatore",
             "es": "Watchdog para instancias de adaptador",
             "pl": "Watchdog dla instancji adaptera",
+            "uk": "Watchdog for adapter instances",            
             "zh-cn": "适配器实例的看门狗"
         },
         "authors": ["Acgua <no@mail.com>"],
-        "keywords": ["instance", "adapter", "watcher", "watchdog", "schedule", "daemon"],
+        "keywords": ["instance", "watcher", "watchdog", "schedule", "daemon"],
         "license": "Apache-2.0",
         "platform": "Javascript/Node.js",
         "main": "build/main.js",
@@ -59,9 +61,14 @@
         "materialize": true,
         "dependencies": [
             {
-                "js-controller": ">=2.0.0"
+                "js-controller": ">=3.0.0"
+            }   
+        ],
+        "globalDependencies": [
+            {
+                "admin": ">=5.0.0"
             }
-        ]
+        ]        
     },
     "native": {
         "blacklist": ""

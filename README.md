@@ -1,4 +1,5 @@
 ![Logo](admin/instance-watcher.png)
+
 # ioBroker.instance-watcher
 
 [![NPM version](https://img.shields.io/npm/v/iobroker.instance-watcher.svg)](https://www.npmjs.com/package/iobroker.instance-watcher)
@@ -12,7 +13,8 @@
 **Tests:** ![Test and Release](https://github.com/Acgua/ioBroker.instance-watcher/workflows/Test%20and%20Release/badge.svg)
 
 ## ioBroker Adapter Instances Watcher
-*Watchdog to monitor all ioBroker adapter instances.*
+
+_Watchdog to monitor all ioBroker adapter instances._
 
 ## Purpose
 
@@ -20,7 +22,7 @@ Ziel dieses Adapters ist es, über Datenpunkte zuverlässig zu sehen, ob eine Ad
 Nehmen wir als Beispiel einen **Deamon-Adapter** wie etwa sonos, alexa2, cloud, backitup, fullybrowser, hm-rpc, o.ä., hier im Beispiel jetzt einfach cloud.0:
 
 | State / Objekt                                                | Erläuterung                                                                                                                         |
-|---------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | Objekt `system.adapter.cloud.0`, Eigenschaft `common.enabled` | Zeigt, ob die Instanz ein- oder ausgeschaltet ist.                                                                                  |
 | State `system.adapter.cloud.0.alive`                          | Zeigt, ob die Instanz überhaupt "am Leben" ist.                                                                                     |
 | State `system.adapter.cloud.0.connected`                      | Zeigt, ob die Instanz mit dem Host verbunden ist.                                                                                   |
@@ -32,45 +34,46 @@ Nur wenn all diese Datenpunkte/Eigenschaften auf `true` gesetzt sind, "läuft" d
 Stattdessen kann man folgendes machen:
 
 | State / Objekt                                                    | Erläuterung                                                                                                                                                                                                                                                                       |
-|-------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Objekt `system.adapter.daswetter.0`, Eigenschaft `common.enabled` | Zeigt, ob die Instanz ein- oder ausgeschaltet ist.                                                                                                                                                                                                                                |
 | State `system.adapter.daswetter.0.alive`                          | Hier zeigt u.a. der Timestamp des Datenpunktes, wann diese Adapterinstanz zuletzt gelaufen ist. Hiermit kann man dann prüfen, ob der letzte Lauf pünktlich gemäß Zeitplan war. <br>Der Zeitplan steht dabei in Objekt `system.adapter.daswetter.0`, Eigenschaft `common.schedule` |
 
-
 ---
+
 Dieser Adapter berücksichtigt die oben erklärten Gegebenheiten und stellt pro Adapter-Instanz einen Datenpunkt `.isOperating`zur Verfügung, der zeigt, ob die ioBroker-Adapter-Instanzen zuverlässig "laufen", z.B. `instance-watcher.0.instances.daswetter.0.isOperating` oder `instance-watcher.0.instances.sonos.1.isOperating`.
 
-
-
-
-
 ## Link to ioBroker Forum Thread
- * PLACEHOLDER
+
+-   PLACEHOLDER
 
 ## TO DO
- * Currently, only adapter instance modes 'schedule' and 'daemon' are supported.
- * TEST: What happens if user deletes an instance?
+
+-   Currently, only adapter instance modes 'schedule' and 'daemon' are supported.
+-   TEST: What happens if user deletes an instance?
 
 ## Changelog
+
 <!--
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
 
 ### **WORK IN PROGRESS**
-* (Acgua) initial release
+
+-   (Acgua) initial release
 
 ## Used icons
- * Adapter icon: [Monitor icon created by Freepik - Flaticon](https://www.flaticon.com/premium-icon/monitoring_1146490)
 
+-   Adapter icon: [Monitor icon created by Freepik - Flaticon](https://www.flaticon.com/premium-icon/monitoring_1146490)
 
 ## License
+
 ```
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
-   Copyright (c) 2022 Acgua
+   Copyright (c) 2023 Acgua <https://github.com/Acgua>
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
