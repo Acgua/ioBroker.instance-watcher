@@ -61,14 +61,10 @@
         "materialize": true,
         "dependencies": [
             {
-                "js-controller": ">=3.0.0"
-            }   
-        ],
-        "globalDependencies": [
-            {
+                "js-controller": ">=3.0.0",
                 "admin": ">=5.0.0"
-            }
-        ]        
+            }   
+        ]
     },
     "native": {
         "blacklist": ""
