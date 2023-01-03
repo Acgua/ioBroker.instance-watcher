@@ -191,23 +191,24 @@ export class InstanceWatcher extends utils.Adapter {
      * @param id - e.g. 'sonos.0'
      * @returns true if operating, false if not
      */
-    private async _asyncUpdateInstanceInfo(id: string): Promise<true | false | undefined> {
+    private async _asyncUpdateInstanceInfo(id: string): Promise<true | false> {
         try {
             if (!this._inst.objs[id]) throw `Instance ${id} not available in instanceObjects`;
 
-            let isOperating = undefined as true | false | undefined;
+            let isOperating: true | false = false;
 
             // Status .enabled
             const obj = await this.getForeignObjectAsync(`system.adapter.${id}`);
             if (!obj || !obj.common || typeof obj.common.enabled !== 'boolean' || obj.common.enabled === undefined) throw `Could not get common.enabled of object 'system.adapter.${id}'.`;
             this._inst.objs[id].enabled = obj.common.enabled;
-            isOperating = obj.common.enabled;
 
-            /**
-             * Daemon Adapter Instances
-             */
-            if (this._inst.objs[id].mode === 'daemon') {
-                if (isOperating) {
+            if (!this._inst.objs[id].enabled) {
+                isOperating = false;
+            } else {
+                /**
+                 * Daemon Adapter Instances
+                 */
+                if (this._inst.objs[id].mode === 'daemon') {
                     // Status .alive
                     const obj = await this.getForeignStateAsync(`system.adapter.${id}.alive`);
                     if (!obj || obj.val === null || typeof obj.val !== 'boolean' || obj.val === undefined) throw `Could not get state value of 'system.adapter.${id}.alive'.`;
@@ -232,9 +233,10 @@ export class InstanceWatcher extends utils.Adapter {
                             }
                         }
                     }
-                }
-            } else if (this._inst.objs[id].mode === 'schedule') {
-                if (isOperating) {
+                } else if (this._inst.objs[id].mode === 'schedule') {
+                    /**
+                     * Schedule Adapter Instances
+                     */
                     const objIsAlive = await this.getForeignStateAsync(`system.adapter.${id}.alive`); // we check the timestamp, which reflects last update
                     if (!objIsAlive || typeof objIsAlive.ts !== 'number') throw `Could not get timestamp of state 'system.adapter.${id}.alive'.`;
                     const lastUpdateSecsAgo = Math.floor((Date.now() - objIsAlive.ts) / 1000); // Last update of state in seconds
@@ -246,9 +248,6 @@ export class InstanceWatcher extends utils.Adapter {
                     const diff = lastCronRunSecs - lastUpdateSecsAgo;
                     isOperating = diff > -300 ? true : false; // We allow 300 seconds (5 minutes) difference
                 }
-            } else {
-                this.log.info(`Instance ${id}: isOperating status for mode '${this._inst.objs[id].mode}' is not yet supported.`);
-                isOperating = false;
             }
 
             // Finally
@@ -272,7 +271,7 @@ export class InstanceWatcher extends utils.Adapter {
             return isOperating;
         } catch (e) {
             this.log.error(this.err2Str(e));
-            return undefined;
+            return false;
         }
     }
 

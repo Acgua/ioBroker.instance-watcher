@@ -157,14 +157,15 @@ class InstanceWatcher extends utils.Adapter {
     try {
       if (!this._inst.objs[id])
         throw `Instance ${id} not available in instanceObjects`;
-      let isOperating = void 0;
+      let isOperating = false;
       const obj = await this.getForeignObjectAsync(`system.adapter.${id}`);
       if (!obj || !obj.common || typeof obj.common.enabled !== "boolean" || obj.common.enabled === void 0)
         throw `Could not get common.enabled of object 'system.adapter.${id}'.`;
       this._inst.objs[id].enabled = obj.common.enabled;
-      isOperating = obj.common.enabled;
-      if (this._inst.objs[id].mode === "daemon") {
-        if (isOperating) {
+      if (!this._inst.objs[id].enabled) {
+        isOperating = false;
+      } else {
+        if (this._inst.objs[id].mode === "daemon") {
           const obj2 = await this.getForeignStateAsync(`system.adapter.${id}.alive`);
           if (!obj2 || obj2.val === null || typeof obj2.val !== "boolean" || obj2.val === void 0)
             throw `Could not get state value of 'system.adapter.${id}.alive'.`;
@@ -186,9 +187,7 @@ class InstanceWatcher extends utils.Adapter {
               }
             }
           }
-        }
-      } else if (this._inst.objs[id].mode === "schedule") {
-        if (isOperating) {
+        } else if (this._inst.objs[id].mode === "schedule") {
           const objIsAlive = await this.getForeignStateAsync(`system.adapter.${id}.alive`);
           if (!objIsAlive || typeof objIsAlive.ts !== "number")
             throw `Could not get timestamp of state 'system.adapter.${id}.alive'.`;
@@ -203,9 +202,6 @@ class InstanceWatcher extends utils.Adapter {
           const diff = lastCronRunSecs - lastUpdateSecsAgo;
           isOperating = diff > -300 ? true : false;
         }
-      } else {
-        this.log.info(`Instance ${id}: isOperating status for mode '${this._inst.objs[id].mode}' is not yet supported.`);
-        isOperating = false;
       }
       if (this._inst.objs[id].enabled && !isOperating) {
         this.addLogLineToEnabledNotOperating(id, "not operating");
@@ -222,7 +218,7 @@ class InstanceWatcher extends utils.Adapter {
       return isOperating;
     } catch (e) {
       this.log.error(this.err2Str(e));
-      return void 0;
+      return false;
     }
   }
   async addLogLineToEnabledNotOperating(id, what) {

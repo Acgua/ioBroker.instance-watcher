@@ -64,8 +64,7 @@
         ]
     },
     "native": {
-        "blacklist": "",
-        "schedule-conf": "daswetter: NextHours.Location_1.Day_1.current.temp_value\nfeiertage: heute.boolean\nical: data.count"
+        "blacklist": ""
     },
     "objects": [],
     "instanceObjects": []
