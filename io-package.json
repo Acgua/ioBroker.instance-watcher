@@ -1,0 +1,71 @@
+{
+    "common": {
+        "name": "instance-watcher",
+        "version": "0.0.1",
+        "news": {
+            "0.0.1": {
+                "en": "initial release",
+                "de": "Erstveröffentlichung",
+                "ru": "Начальная версия",
+                "pt": "lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "zh-cn": "首次出版"
+            }
+        },
+        "title": "Instance Watcher",
+        "titleLang": {
+            "en": "Instance Watcher",
+            "de": "Instance Watcher",
+            "ru": "Наблюдатель экземпляров",
+            "pt": "Observador de instância",
+            "nl": "Instantiebewaking",
+            "fr": "Observateur d'instance",
+            "it": "Osservatore di istanze",
+            "es": "Vigilante de instancias",
+            "pl": "Obserwator instancji",
+            "zh-cn": "实例观察者"
+        },
+        "desc": {
+            "en": "Watchdog for adapter instances",
+            "de": "Watchdog für Adapterinstanzen",
+            "ru": "Сторожевой таймер для экземпляров адаптера",
+            "pt": "Watchdog para instâncias do adaptador",
+            "nl": "Watchdog voor adapterinstanties",
+            "fr": "Chien de garde pour les instances d'adaptateur",
+            "it": "Watchdog per le istanze dell'adattatore",
+            "es": "Watchdog para instancias de adaptador",
+            "pl": "Watchdog dla instancji adaptera",
+            "zh-cn": "适配器实例的看门狗"
+        },
+        "authors": ["Acgua <no@mail.com>"],
+        "keywords": ["instance", "adapter", "watcher", "watchdog", "schedule", "daemon"],
+        "license": "Apache-2.0",
+        "platform": "Javascript/Node.js",
+        "main": "build/main.js",
+        "icon": "instance-watcher.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/Acgua/ioBroker.instance-watcher/main/admin/instance-watcher.png",
+        "readme": "https://github.com/Acgua/ioBroker.instance-watcher/blob/main/README.md",
+        "loglevel": "info",
+        "mode": "daemon",
+        "type": "misc-data",
+        "compact": true,
+        "connectionType": "local",
+        "dataSource": "poll",
+        "materialize": true,
+        "dependencies": [
+            {
+                "js-controller": ">=2.0.0"
+            }
+        ]
+    },
+    "native": {
+        "blacklist": ""
+    },
+    "objects": [],
+    "instanceObjects": []
+}
