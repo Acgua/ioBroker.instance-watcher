@@ -225,7 +225,6 @@ export class InstanceWatcher extends utils.Adapter {
                             // Note: only certain adapters have this state
                             if (await this.getForeignObjectAsync(`${id}.info.connection`)) {
                                 // Status info.connection exists
-                                // TODO: Hier noch den Workaround ggf. einbauen!
                                 const obj = await this.getForeignStateAsync(`${id}.info.connection`);
                                 if (!obj || obj.val === null || typeof obj.val !== 'boolean' || obj.val === undefined) throw `Could not get state value of '${id}.info.connection'.`;
                                 this._inst.objs[id].connected_with_device_service = obj.val;

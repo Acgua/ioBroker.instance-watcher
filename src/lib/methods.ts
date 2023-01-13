@@ -26,28 +26,9 @@ import { InstanceWatcher } from '../main';
  */
 export async function asyncInstanceOnOff(this: InstanceWatcher, id: string, flag: true | false): Promise<true | false> {
     try {
-        // If running type is schedule, we will switch off adapter first, then turn on.
-        if (this._inst.objs[id].mode === 'daemon') {
-            await this.setForeignStateAsync(`system.adapter.${id}.alive`, { val: flag, ack: false });
-            this.log.debug(`Adapter instance ${id} (${this._inst.objs[id].mode}) ${flag ? ' turned on.' : ' turned off.'}`);
-            return true;
-        } else if (this._inst.objs[id].mode === 'schedule') {
-            if (flag === false || this._inst.objs[id].enabled) {
-                // Falls instance should be turned off or the schedule adapter is enabled: turn off before
-                await this.setForeignStateAsync(`system.adapter.${id}.alive`, { val: false, ack: false });
-                this.log.debug(`Adapter instance ${id} (${this._inst.objs[id].mode}) turned off.`);
-            }
-            if (flag) {
-                // Einschalten
-                if (this._inst.objs[id].enabled) await this.wait(3000); // wait if was enabled, as turned off before.
-                await this.setForeignStateAsync(`system.adapter.${id}.alive`, { val: true, ack: false });
-                this.log.debug(`Adapter instance ${id} (${this._inst.objs[id].mode}) turned on.`);
-            }
-            return true;
-        } else {
-            this.log.warn(`Running mode '${this._inst.objs[id].mode}' of adapter '${id}' is not yet supported!`);
-            return false;
-        }
+        await this.extendForeignObjectAsync(`system.adapter.${id}`, { common: { enabled: flag } });
+        this.log.debug(`Adapter instance ${id} (${this._inst.objs[id].mode}) ${flag ? ' turned on.' : ' turned off.'}`);
+        return true;
     } catch (e) {
         this.log.error(this.err2Str(e));
         return false;
