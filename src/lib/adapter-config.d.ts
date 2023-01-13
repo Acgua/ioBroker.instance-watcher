@@ -7,6 +7,7 @@ declare global {
             // option1: boolean;
             // option2: string;
             blacklist: string;
+            maxlog: number;
         }
     }
 }

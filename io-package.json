@@ -71,7 +71,8 @@
         ]
     },
     "native": {
-        "blacklist": ""
+        "blacklist": "",
+        "maxlog": 100
     },
     "objects": [],
     "instanceObjects": []

@@ -38,7 +38,6 @@ export class InstanceWatcher extends utils.Adapter {
 
     readonly regexValidInstance = /[a-z][a-z0-9\-_]*.[0-9]{1,2}$/; // to check whether an instance like 'sonos.0' is valid.
     readonly queueDelay = 1000; // Delay in ms for recursive update function to avoid multiple calls if several calls come in almost the same time.
-    readonly logEnabledNotOperatingMaxLen = 100; // state 'info.enabledNotOperatingLog': max. number of lines
 
     // Schedules
     public schedules = {} as { [k: string]: any };
@@ -86,11 +85,13 @@ export class InstanceWatcher extends utils.Adapter {
             }
 
             // Get initial log from state
-            const logObj = await this.getStateAsync('info.enabledNotOperatingLog');
-            if (logObj && logObj.val && typeof logObj.val === 'string' && logObj.val.length > 20) {
-                this._inst.enabledNotOperatingLog = JSON.parse(logObj.val);
-            } else {
-                this._inst.enabledNotOperatingLog = [];
+            if (this.config.maxlog > 0) {
+                const logObj = await this.getStateAsync('info.enabledNotOperatingLog');
+                if (logObj && logObj.val && typeof logObj.val === 'string' && logObj.val.length > 20) {
+                    this._inst.enabledNotOperatingLog = JSON.parse(logObj.val);
+                } else {
+                    this._inst.enabledNotOperatingLog = [];
+                }
             }
 
             // Update States
@@ -252,7 +253,7 @@ export class InstanceWatcher extends utils.Adapter {
             // Finally
             if (this._inst.objs[id].enabled && !isOperating) {
                 // add to enabled but not operating log
-                this.addLogLineToEnabledNotOperating(id, 'not operating');
+                if (this.config.maxlog > 0) this.addLogLineToEnabledNotOperating(id, 'not operating');
                 // add to enabled but not operating Instances
                 if (!this._inst.enabledNotOperatingList.includes(id)) {
                     this._inst.enabledNotOperatingList.push(id);
@@ -260,7 +261,7 @@ export class InstanceWatcher extends utils.Adapter {
                 }
             } else {
                 // add to enabled but not operating log
-                this.addLogLineToEnabledNotOperating(id, this._inst.objs[id].enabled ? 'operating' : 'turned off');
+                if (this.config.maxlog > 0) this.addLogLineToEnabledNotOperating(id, this._inst.objs[id].enabled ? 'operating' : 'turned off');
                 // remove from enabledNotOperatingInstances (which only lists enabled adapter instances)
                 this._inst.enabledNotOperatingList = this._inst.enabledNotOperatingList.filter((e) => e !== id); // Removes "id", if existing
                 this._inst.enabledNotOperatingList.sort();
@@ -281,6 +282,7 @@ export class InstanceWatcher extends utils.Adapter {
      */
     private async addLogLineToEnabledNotOperating(id: string, what: 'operating' | 'not operating' | 'turned off'): Promise<void> {
         try {
+            if (this.config.maxlog < 1) return;
             // check if we already have an entry
             let previousStatus = '';
             for (const line of this._inst.enabledNotOperatingLog) {
@@ -301,8 +303,8 @@ export class InstanceWatcher extends utils.Adapter {
                     timestamp: Date.now(),
                 };
                 // set new array length to remove any exceeding items
-                if (this._inst.enabledNotOperatingLog.length >= this.logEnabledNotOperatingMaxLen) {
-                    this._inst.enabledNotOperatingLog.length = this.logEnabledNotOperatingMaxLen - 1;
+                if (this._inst.enabledNotOperatingLog.length >= this.config.maxlog) {
+                    this._inst.enabledNotOperatingLog.length = this.config.maxlog - 1;
                 }
                 // finally add to log
                 this._inst.enabledNotOperatingLog = [logLine].concat(this._inst.enabledNotOperatingLog); // add as first element to array
@@ -386,7 +388,7 @@ export class InstanceWatcher extends utils.Adapter {
         try {
             await this.setStateChangedAsync('info.enabledNotOperatingCount', { val: this._inst.enabledNotOperatingList.length, ack: true });
             await this.setStateChangedAsync('info.enabledNotOperatingList', { val: JSON.stringify(this._inst.enabledNotOperatingList), ack: true });
-            await this.setStateChangedAsync('info.enabledNotOperatingLog', { val: JSON.stringify(this._inst.enabledNotOperatingLog), ack: true });
+            if (this.config.maxlog > 0) await this.setStateChangedAsync('info.enabledNotOperatingLog', { val: JSON.stringify(this._inst.enabledNotOperatingLog), ack: true });
             await this.setStateAsync('info.updatedDate', { val: Date.now(), ack: true });
 
             let list: Array<string> = [];
@@ -528,7 +530,7 @@ export class InstanceWatcher extends utils.Adapter {
             await this.setObjectNotExistsAsync('info', { type: 'channel', common: { name: 'Information (all adapter instances)' }, native: {} });
             await this.setObjectNotExistsAsync('info.enabledNotOperatingCount', { type: 'state', common: { name: 'Counter: Enabled but not functioning instances', type: 'number', role: 'info', read: true, write: false, def: 0 }, native: {} });
             await this.setObjectNotExistsAsync('info.enabledNotOperatingList', { type: 'state', common: { name: 'List: Enabled but not functioning instances', type: 'array', role: 'info', read: true, write: false, def: '[]' }, native: {} });
-            await this.setObjectNotExistsAsync('info.enabledNotOperatingLog', { type: 'state', common: { name: 'Log of enabled but not functioning instances', type: 'string', role: 'json', read: true, write: false, def: '[]' }, native: {} });
+            if (this.config.maxlog > 0) await this.setObjectNotExistsAsync('info.enabledNotOperatingLog', { type: 'state', common: { name: 'Log of enabled but not functioning instances', type: 'string', role: 'json', read: true, write: false, def: '[]' }, native: {} });
             await this.setObjectNotExistsAsync('info.updatedDate', { type: 'state', common: { name: 'Last update', type: 'number', role: 'date', read: true, write: false, def: 0 }, native: {} });
 
             // Create adapter instance device and state objects
@@ -540,6 +542,15 @@ export class InstanceWatcher extends utils.Adapter {
                 await this.setObjectNotExistsAsync(path + '.on', { type: 'state', common: { name: 'Switch instance on (or restart, if running).', type: 'boolean', role: 'button', read: true, write: true }, native: {} });
                 await this.setObjectNotExistsAsync(path + '.off', { type: 'state', common: { name: 'Switch instance off.', type: 'boolean', role: 'button', read: true, write: true }, native: {} });
                 await this.setObjectNotExistsAsync(path + '.enabled', { type: 'state', common: { name: 'Enable status of instance. You can switch instance on/off with this state', type: 'boolean', role: 'switch', read: true, write: true }, native: {} });
+            }
+
+            /**
+             * Cleanup: Delete log states if deactivated in instance config (0)
+             */
+            if (this.config.maxlog < 1) {
+                if ((await this.getObjectAsync('info.enabledNotOperatingLog')) !== undefined) {
+                    await this.delObjectAsync('info.enabledNotOperatingLog', { recursive: false });
+                }
             }
 
             /**
