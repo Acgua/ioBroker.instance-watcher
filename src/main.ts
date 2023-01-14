@@ -85,12 +85,7 @@ export class InstanceWatcher extends utils.Adapter {
             // Create objects/states, if not existing
             if (!(await this.createObjectsAsync())) throw 'Failed to create objects with createObjectsAsync()';
 
-            // Get initial isOperating and enabled status in _inst.objs
-            for (const id of this._inst.list) {
-                await this._asyncUpdateInstanceInfo(id);
-            }
-
-            // Get initial log from state
+            // Get initial log from 'info.enabledNotOperatingLog'
             if (this.config.maxlog) {
                 const logObj = await this.getStateAsync('info.enabledNotOperatingLog');
                 if (logObj && logObj.val && typeof logObj.val === 'string' && logObj.val.length > 20) {
@@ -98,6 +93,11 @@ export class InstanceWatcher extends utils.Adapter {
                 } else {
                     this._inst.enabledNotOperatingLog = [];
                 }
+            }
+
+            // Get initial isOperating and enabled status in _inst.objs
+            for (const id of this._inst.list) {
+                await this._asyncUpdateInstanceInfo(id);
             }
 
             // Update States

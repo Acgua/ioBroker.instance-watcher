@@ -80,9 +80,6 @@ class InstanceWatcher extends utils.Adapter {
       this._inst.list = Object.keys(this._inst.objs).sort();
       if (!await this.createObjectsAsync())
         throw "Failed to create objects with createObjectsAsync()";
-      for (const id of this._inst.list) {
-        await this._asyncUpdateInstanceInfo(id);
-      }
       if (this.config.maxlog) {
         const logObj = await this.getStateAsync("info.enabledNotOperatingLog");
         if (logObj && logObj.val && typeof logObj.val === "string" && logObj.val.length > 20) {
@@ -90,6 +87,9 @@ class InstanceWatcher extends utils.Adapter {
         } else {
           this._inst.enabledNotOperatingLog = [];
         }
+      }
+      for (const id of this._inst.list) {
+        await this._asyncUpdateInstanceInfo(id);
       }
       await this.updateOperatingStates("all");
       for (const id of this._inst.list) {
