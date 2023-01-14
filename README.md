@@ -16,17 +16,41 @@
 
 _Watchdog to monitor all ioBroker adapter instances._
 
-## Purpose
+## Über
+Ein Ziel dieses Adapters ist es, über Datenpunkte zuverlässig zu sehen, ob eine Adapter-Instanz "läuft" oder nicht.
 
-Ziel dieses Adapters ist es, über Datenpunkte zuverlässig zu sehen, ob eine Adapter-Instanz "läuft" oder nicht.
-Nehmen wir als Beispiel einen **Deamon-Adapter** wie etwa sonos, alexa2, cloud, backitup, fullybrowser, hm-rpc, o.ä., hier im Beispiel jetzt einfach cloud.0:
+Dieser Adapter bietet die folgenden Datenpunkte (States):
+
+| Datenpunkt | Beschreibung |
+|---|---|
+| summary.**enoCount** | Anzahl aller Adapter-Instanzen, die eingeschaltet sind, aber nicht "laufen" (eno = **e**nabled but **n**ot **o**perating) |
+| summary.**enoList** | Liste aller Adapter-Instanzen, die eingeschaltet sind, aber nicht "laufen" |
+| summary.**enoSummaryLog** | JSON-Log für alle Instanzen. Wenn eine Adapter-Instanz eingeschaltet ist aber nicht "läuft", wird ein Eintrag hinzugefügt mit Status "not operating". Läuft die Instanz wieder, wird ein neuer Eintrag mit Status "operating" hinzugefügt. |
+
+Außerdem gibt es für jede installierte Adapter-Instanz folgende Datenpunkte unterhalb `instance-watcher.0.instances.<adapter>.<instanz>` (z.B. `instance-watcher.0.instances.alexa2.0`):
+
+| Datenpunkt | Beschreibung |
+|---|---|
+| **enabled** | Zeigt an, ob Instanz ein- oder ausgeschaltet ist. Durch Setzen des Datenpunktes kann auch geschaltet werden: ein (true) und aus (false). |
+| **isOperating** | Zeigt an, ob die Instanz eingeschaltet ist und "läuft". |
+| **enoLog** | JSON-Log für diese Instanz. Siehe Erklärung oben unter *summary.enoSummaryLog* |
+| **on** | Button zum Einschalten der Instanz |
+| **off** | Button zum Ausschalten der Instanz |
+| **mode** | Modus der Adapterinstanz (none, daemon, subscribe, schedule, once, extension) |
+
+
+## Erklärung zu: Instanz "läuft" oder "läuft nicht"
+
+Ob eine Adapter-Instanz eingeschaltet ist, sieht man anhand des Objektes Objekt `system.adapter.alexa2.0`, Eigenschaft `common.enabled`. Das bedeutet aber nicht, dass die Instanz "am Leben" ist und sauber läuft.
+
+Nehmen wir als Beispiel einen **Deamon-Adapter** wie etwa sonos, alexa2, cloud, backitup, fullybrowser, hm-rpc, o.ä., hier im Beispiel jetzt einfach alexa2.0:
 
 | State / Objekt                                                | Erläuterung                                                                                                                         |
 | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Objekt `system.adapter.cloud.0`, Eigenschaft `common.enabled` | Zeigt, ob die Instanz ein- oder ausgeschaltet ist.                                                                                  |
-| State `system.adapter.cloud.0.alive`                          | Zeigt, ob die Instanz überhaupt "am Leben" ist.                                                                                     |
-| State `system.adapter.cloud.0.connected`                      | Zeigt, ob die Instanz mit dem Host verbunden ist.                                                                                   |
-| State `cloud.0.info.connection`                               | Zeigt, ob die Instanz mit einem Gerät oder Service verbunden ist. <br>Hinweis: Dieser State ist nicht bei allen Adaptern vorhanden. |
+| Objekt `system.adapter.alexa2.0`, Eigenschaft `common.enabled` | Zeigt, ob die Instanz ein- oder ausgeschaltet ist.                                                                                  |
+| State `system.adapter.alexa2.0.alive`                          | Zeigt, ob die Instanz überhaupt "am Leben" ist.                                                                                     |
+| State `system.adapter.alexa2.0.connected`                      | Zeigt, ob die Instanz mit dem Host verbunden ist.                                                                                   |
+| State `alexa2.0.info.connection`                               | Zeigt, ob die Instanz mit einem Gerät oder Service verbunden ist. <br>Hinweis: Dieser State ist nicht bei allen Adaptern vorhanden. |
 
 Nur wenn all diese Datenpunkte/Eigenschaften auf `true` gesetzt sind, "läuft" der Adapter zuverlässig.
 
@@ -38,18 +62,16 @@ Stattdessen kann man folgendes machen:
 | Objekt `system.adapter.daswetter.0`, Eigenschaft `common.enabled` | Zeigt, ob die Instanz ein- oder ausgeschaltet ist.                                                                                                                                                                                                                                |
 | State `system.adapter.daswetter.0.alive`                          | Hier zeigt u.a. der Timestamp des Datenpunktes, wann diese Adapterinstanz zuletzt gelaufen ist. Hiermit kann man dann prüfen, ob der letzte Lauf pünktlich gemäß Zeitplan war. <br>Der Zeitplan steht dabei in Objekt `system.adapter.daswetter.0`, Eigenschaft `common.schedule` |
 
----
+<br>
 
-Dieser Adapter berücksichtigt die oben erklärten Gegebenheiten und stellt pro Adapter-Instanz einen Datenpunkt `.isOperating`zur Verfügung, der zeigt, ob die ioBroker-Adapter-Instanzen zuverlässig "laufen", z.B. `instance-watcher.0.instances.daswetter.0.isOperating` oder `instance-watcher.0.instances.sonos.1.isOperating`.
+Dieser Adapter berücksichtigt die oben erklärten Gegebenheiten und stellt pro Adapter-Instanz einen Datenpunkt `.isOperating` zur Verfügung, der zeigt, ob die ioBroker-Adapter-Instanzen zuverlässig "laufen", z.B. `instance-watcher.0.instances.daswetter.0.isOperating` oder `instance-watcher.0.instances.sonos.1.isOperating`.
 
-## Link to ioBroker Forum Thread
-
--   PLACEHOLDER
 
 ## TO DO
 
 -   Currently, only adapter instance modes 'schedule' and 'daemon' are supported.
 -   TEST: What happens if user deletes an instance?
+-   Translations
 
 ## Changelog
 
@@ -60,7 +82,12 @@ Dieser Adapter berücksichtigt die oben erklärten Gegebenheiten und stellt pro 
 
 ### **WORK IN PROGRESS**
 
+-   (Acgua) work in progress
+
+### 0.0.1 (2023-01-14)
+
 -   (Acgua) initial release
+
 
 ## Used icons
 
