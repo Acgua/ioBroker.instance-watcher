@@ -72,7 +72,9 @@
     },
     "native": {
         "blacklist": "",
-        "maxlog": 100
+        "maxlog_summary": 100,
+        "maxlog_inst": 100,
+        "queue_delay": 1000
     },
     "objects": [],
     "instanceObjects": []

@@ -7,7 +7,9 @@ declare global {
             // option1: boolean;
             // option2: string;
             blacklist: string;
-            maxlog: number;
+            maxlog_summary: number;
+            maxlog_inst: number;
+            queue_delay: number;
         }
     }
 }

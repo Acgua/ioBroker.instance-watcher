@@ -1,4 +1,4 @@
-![Logo](admin/instance-watcher.png)
+![Logo](admin/instance-watcher_64x64.png)
 
 # ioBroker.instance-watcher
 

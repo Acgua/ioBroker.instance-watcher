@@ -59,37 +59,55 @@
 
     <body>
         <div class="m adapter-container">
-            <div class="row">
-                <div class="col s12 m4 l2">
-                    <img src="instance-watcher.png" class="logo" />
+            <!-- Header Logo and Buttons -->
+            <div id="header-area" class="row" >
+                <div id="header-logo-title" class="col s6">
+                    <img class="logo" src="instance-watcher.png" />
+                    <p>
+                        <span class="h-title">Instance Watcher</span><br />
+                        <span class="translate h-sub-title">Monitor ioBroker adapter instances…</span>
+                    </p>                    
                 </div>
             </div>
 
-            <!-- Put your content here -->
-            <div class="row"><h3 style="margin-left: .3em">
-                Instance Watcher Settings
-            </h3></div>
-            <hr style="margin-left: 15px" />
-            <div style="margin-bottom: 5em"></div>
-            <!-- For example columns with settings: -->
-            <div class="row">
-                <div class="col s6 input-field">
-                    <h5>Blacklist: Adapter instances that should not be included:</h5>
-                    <input type="text" class="value" id="blacklist" />
-                    <span class="helper-text translate" style="font-size: 1.2em">
-                        Comma separated. Example: <code>admin.0, sonos.1</code> . Leave empty to include all instances.
-                    </span>
+            <div style="margin-top: 50px"></div>
+
+            <!-- Content -->
+            <div style="margin: 10px">
+                <!---------------- Info ---------------->
+                <div class="row">
+                    <p><span class="translate">See</span> <a target="_blank" href="https://github.com/Acgua/ioBroker.instance-watcher"><span class="translate">documentation</span></a> <span class="translate">for details</span>.</p>
+                </div>
+                <!---------------- General Settings ---------------->
+                <div class="row">
+                    <p class="translate title">General Settings</p>
+                    <div class="col s4 input-field">
+                        <input type="text" class="value" id="blacklist" />
+                        <label for="blacklist" class="translate">Adapter instances blacklist</label>
+                        <span class="translate">Comma separated blacklist, example: <code>admin.0, sonos.1</code></span>
+                    </div>
+                    <div class="col s4 input-field">
+                        <input type="number" min="0" max="1000" class="value" id="maxlog_summary" />
+                        <label for="maxlog_all" class="translate">Summary: Max. log entries</label>
+                        <span class="translate">Summary: max. number of log entries (0 to deactivate)</span>
+                    </div>
+                    <div class="col s4 input-field">
+                        <input type="number" min="0" max="1000" class="value" id="maxlog_inst" />
+                        <label for="maxlog_all" class="translate">Each instance: Max. log entries</label>
+                        <span class="translate">Each instance: max. number of log entries (0 to deactivate)</span>
+                    </div>
+                </div>
+                <!---------------- Expert Settings ---------------->
+                <div class="row">
+                    <p class="translate title">Expert Settings</p>
+                    <div class="col s4 input-field">
+                        <input type="number" min="0" max="100000" class="value" id="queue_delay" />
+                        <label for="queue_delay">Queue delay in ms</label>
+                        <span class="translate">Delay in ms for recursive update function to avoid multiple calls if several calls come in almost the same time. Default:</span> 1000
+                    </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col s6 input-field">
-                    <h5>Max log lines:</h5>
-                    <input type="number" class="value" id="maxlog" />
-                    <span class="helper-text translate" style="font-size: 1.2em">
-                        Maximum number of logs in log states (0 to deactivate).
-                    </span>
-                </div>
-            </div>
+            <!-- Content -->
         </div>
     </body>
 </html>

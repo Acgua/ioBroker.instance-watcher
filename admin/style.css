@@ -4,7 +4,8 @@
 }
 .m {
     /* Don't cut off dropdowns! */
-    overflow: initial;
+    /* Acgua: deactivated to avoid vertical scrollbar! */
+    /*overflow: initial; */
 }
 .m.adapter-container,
 .m.adapter-container > div.App {
@@ -30,3 +31,44 @@ label > i[title] {
 }
 
 /* Add your styles here */
+/* ------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------ */
+
+/* Header area */
+#header-area {margin-top: 5px; margin-bottom: 1px; background-color:#2f4a73;}
+#header-area #header-logo-title .logo {float:left; margin-right: 10px;}
+#header-area #header-logo-title p {line-height: normal !important; margin: 0 !important; padding: 8px 0 0 8px;}
+#header-area #header-logo-title p>span.h-title {font-size: 2em !important; color:white; }
+#header-area #header-logo-title p>span.h-sub-title {font-size: 1.1em !important; color:white; font-style: italic; }
+
+
+/* span is set to 0.9em for some unknown reason, we set back to 1.0em  */
+.m span {
+    font-size: 1.0em !important;
+}
+
+.m p.title {
+    font-weight: bold;
+    background-color: #2f4a73;
+}
+
+.m div.row p {
+    margin-left: 10px;
+}
+
+/* unvisited link */
+.m div.row a:link {
+    color: #2696ef !important;
+}
+/* visited link */
+.m div.row a:visited {
+    color: #2696ef !important;
+}
+/* mouse over link */
+.m div.row a:hover {
+    text-decoration: underline;
+}
+/* selected link */
+.m div.row a:active {
+    color: #2696ef;
+}
