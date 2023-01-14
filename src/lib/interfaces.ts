@@ -12,6 +12,7 @@ export interface IInstance {
     connected_with_host?: true | false;
     connected_with_device_service?: true | false;
     isOperating?: true | false;
+    enoLog?: ILog[];
 
     // for asyncUpdateQueue()
     _recentChange: number; // last change (Date.now()) of: enabled, alive, connected_with_host, connected_with_device_service

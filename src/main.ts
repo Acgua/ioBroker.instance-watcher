@@ -32,8 +32,8 @@ export class InstanceWatcher extends utils.Adapter {
     public _inst = {
         list: [] as Array<string>, // ['admin.0', 'bring.0', ...]
         objs: {} as { [k: string]: IInstance }, // {"admin.0": {id:.., mode:...}, "bring.0": {id:.., mode:...} }
-        enabledNotOperatingList: [] as Array<string>, // List of adapter instances enabled, but not operating, like: ['bring.0', '...']
-        enabledNotOperatingLog: [] as Array<ILog>,
+        enoList: [] as Array<string>, // List of adapter instances enabled, but not operating, like: ['bring.0', '...']
+        enoSummaryLog: undefined as Array<ILog> | undefined,
     };
 
     // to check whether an instance like 'sonos.0' is valid.
@@ -94,13 +94,13 @@ export class InstanceWatcher extends utils.Adapter {
             // Create objects/states, if not existing
             if (!(await this.createObjectsAsync())) throw 'Failed to create objects with createObjectsAsync()';
 
-            // Get initial log from 'summary.enabledNotOperatingLog'
+            // Get initial log from 'summary.enoSummaryLog'
             if (this.config.maxlog_summary) {
-                const logObj = await this.getStateAsync('summary.enabledNotOperatingLog');
+                const logObj = await this.getStateAsync('summary.enoSummaryLog');
                 if (logObj && logObj.val && typeof logObj.val === 'string' && logObj.val.length > 20) {
-                    this._inst.enabledNotOperatingLog = JSON.parse(logObj.val);
+                    this._inst.enoSummaryLog = JSON.parse(logObj.val);
                 } else {
-                    this._inst.enabledNotOperatingLog = [];
+                    this._inst.enoSummaryLog = [];
                 }
             }
 
@@ -267,19 +267,24 @@ export class InstanceWatcher extends utils.Adapter {
 
             // Finally
             if (this._inst.objs[id].enabled && !isOperating) {
-                // add to enabled but not operating log
-                if (this.config.maxlog_summary) this.addLogLineToEnabledNotOperating(id, 'not operating');
-                // add to enabled but not operating Instances
-                if (!this._inst.enabledNotOperatingList.includes(id)) {
-                    this._inst.enabledNotOperatingList.push(id);
-                    this._inst.enabledNotOperatingList.sort();
+                // Update ENO Summary Log and Instance Log
+                if (this.config.maxlog_summary) this._inst.enoSummaryLog = this.getUpdateLog(id, this._inst.enoSummaryLog, 'not operating', this.config.maxlog_summary);
+                if (this.config.maxlog_inst) this._inst.objs[id].enoLog = this.getUpdateLog(id, this._inst.objs[id].enoLog, 'not operating', this.config.maxlog_inst);
+
+                // Add to ENO Instances list
+                if (!this._inst.enoList.includes(id)) {
+                    this._inst.enoList.push(id);
+                    this._inst.enoList.sort();
                 }
             } else {
-                // add to enabled but not operating log
-                if (this.config.maxlog_summary) this.addLogLineToEnabledNotOperating(id, this._inst.objs[id].enabled ? 'operating' : 'turned off');
-                // remove from enabledNotOperatingInstances (which only lists enabled adapter instances)
-                this._inst.enabledNotOperatingList = this._inst.enabledNotOperatingList.filter((e) => e !== id); // Removes "id", if existing
-                this._inst.enabledNotOperatingList.sort();
+                // Update ENO Summary Log and Instance Log
+                const status = this._inst.objs[id].enabled ? 'operating' : 'turned off';
+                if (this.config.maxlog_summary) this._inst.enoSummaryLog = this.getUpdateLog(id, this._inst.enoSummaryLog, status, this.config.maxlog_summary);
+                if (this.config.maxlog_inst) this._inst.objs[id].enoLog = this.getUpdateLog(id, this._inst.objs[id].enoLog, status, this.config.maxlog_inst);
+
+                // remove from ENO instances list
+                this._inst.enoList = this._inst.enoList.filter((e) => e !== id); // Removes "id", if existing
+                this._inst.enoList.sort();
             }
             this._inst.objs[id].isOperating = isOperating;
 
@@ -292,41 +297,46 @@ export class InstanceWatcher extends utils.Adapter {
 
     /**
      * Add log line to enabled but not operating log
-     * @param id    instance id like sonos.0
-     * @param what  status
+     * @param id         instance id like sonos.0
+     * @param currentLog The current, existing log
+     * @param status     status
+     * @param max        max. number of log entries
      */
-    private async addLogLineToEnabledNotOperating(id: string, what: 'operating' | 'not operating' | 'turned off'): Promise<void> {
+    private getUpdateLog(id: string, currentLog: ILog[] | undefined, status: 'operating' | 'not operating' | 'turned off', max: number): ILog[] | undefined {
         try {
-            if (!this.config.maxlog_summary) return;
-            // check if we already have an entry
-            let previousStatus = '';
-            for (const line of this._inst.enabledNotOperatingLog) {
-                if (line.instance == id) {
-                    previousStatus = line.status;
-                    break;
+            // check if we already have an entry of the adapter instance in the existing log
+            let prevStatus = '';
+            if (currentLog && currentLog.length > 0) {
+                for (const line of currentLog) {
+                    if (line.instance == id) {
+                        prevStatus = line.status;
+                        break;
+                    }
                 }
             }
+
             // Add only under certain conditions
             let addToLog = false;
-            if (previousStatus === '' && what === 'not operating') addToLog = true; // no previous log, just add non-operating.
-            if (previousStatus !== '' && previousStatus !== what) addToLog = true; // new status came in
-            if (addToLog) {
-                const logLine: ILog = {
-                    date: this.dateToLocalIsoString(new Date()),
-                    instance: id,
-                    status: what,
-                    timestamp: Date.now(),
-                };
-                // set new array length to remove any exceeding items
-                if (this._inst.enabledNotOperatingLog.length >= this.config.maxlog_summary) {
-                    this._inst.enabledNotOperatingLog.length = this.config.maxlog_summary - 1;
-                }
-                // finally add to log
-                this._inst.enabledNotOperatingLog = [logLine].concat(this._inst.enabledNotOperatingLog); // add as first element to array
-            }
+            if (prevStatus === '' && status === 'not operating') addToLog = true; // no previous log, just add non-operating.
+            if (prevStatus !== '' && prevStatus !== status) addToLog = true; // new status came in
+            if (!addToLog) return currentLog;
+
+            const logEntry: ILog = {
+                date: this.dateToLocalIsoString(new Date()),
+                instance: id,
+                status: status,
+                timestamp: Date.now(),
+            };
+
+            // -- If no entries yet, return just the new log entry
+            if (!currentLog || currentLog.length === 0) return [logEntry];
+
+            // remove old array elements if max size is reached
+            if (currentLog.length >= max) currentLog.length = max - 1;
+            return [logEntry].concat(currentLog); // add new entry as first element to array
         } catch (e) {
             this.log.error(this.err2Str(e));
-            return;
+            return currentLog;
         }
     }
 
@@ -351,9 +361,11 @@ export class InstanceWatcher extends utils.Adapter {
                 x = x.replace(/;+/g, ','); // ';' or ';;;' -> ','
                 x = x.replace(/[^0-9a-z-._,]/g, ''); // remove all forbidden chars
                 x = x.replace(/,+/g, ','); // ',,,,' -> ','
+                x = x.replace(/(^,)|(,$)/g, ''); // remove leading and trailing commas
                 this.log.debug(`Blacklist: Cleaned: ${x}`);
                 const xArray = x.split(',');
                 for (const itm of xArray) {
+                    if (itm === '') continue;
                     if (this.regexValidInstance.test(itm)) {
                         blacklist.push(itm);
                     } else {
@@ -401,9 +413,9 @@ export class InstanceWatcher extends utils.Adapter {
      */
     private async updateOperatingStates(what: string): Promise<void> {
         try {
-            await this.setStateChangedAsync('summary.enabledNotOperatingCount', { val: this._inst.enabledNotOperatingList.length, ack: true });
-            await this.setStateChangedAsync('summary.enabledNotOperatingList', { val: JSON.stringify(this._inst.enabledNotOperatingList), ack: true });
-            if (this.config.maxlog_summary) await this.setStateChangedAsync('summary.enabledNotOperatingLog', { val: JSON.stringify(this._inst.enabledNotOperatingLog), ack: true });
+            await this.setStateChangedAsync('summary.enabledNotOperatingCount', { val: this._inst.enoList.length, ack: true });
+            await this.setStateChangedAsync('summary.enoList', { val: JSON.stringify(this._inst.enoList), ack: true });
+            if (this.config.maxlog_summary) await this.setStateChangedAsync('summary.enoSummaryLog', { val: JSON.stringify(this._inst.enoSummaryLog), ack: true });
             await this.setStateAsync('info.updatedDate', { val: Date.now(), ack: true });
 
             let list: Array<string> = [];
@@ -418,6 +430,7 @@ export class InstanceWatcher extends utils.Adapter {
             for (const id of list) {
                 await this.setStateAsync(`instances.${id}.isOperating`, { val: this._inst.objs[id].isOperating, ack: true });
                 await this.setStateAsync(`instances.${id}.enabled`, { val: this._inst.objs[id].enabled, ack: true });
+                if (this.config.maxlog_inst) await this.setStateChangedAsync(`instances.${id}.logEnabledNotOperating`, { val: JSON.stringify(this._inst.objs[id].enoLog), ack: true });
                 if (this._inst.objs[id].enabled) {
                     await this.setStateAsync(`instances.${id}.on`, { val: true, ack: true });
                     await this.setStateAsync(`instances.${id}.off`, { val: false, ack: true });
@@ -544,8 +557,8 @@ export class InstanceWatcher extends utils.Adapter {
             await this.setObjectNotExistsAsync('instances', { type: 'channel', common: { name: 'ioBroker adapter instances' }, native: {} });
             await this.setObjectNotExistsAsync('summary', { type: 'channel', common: { name: 'Summary of all adapter instances' }, native: {} });
             await this.setObjectNotExistsAsync('summary.enabledNotOperatingCount', { type: 'state', common: { name: 'Counter: Enabled but not operating instances', type: 'number', role: 'info', read: true, write: false, def: 0 }, native: {} });
-            await this.setObjectNotExistsAsync('summary.enabledNotOperatingList', { type: 'state', common: { name: 'List: Enabled but not operating instances', type: 'array', role: 'info', read: true, write: false, def: '[]' }, native: {} });
-            if (this.config.maxlog_summary) await this.setObjectNotExistsAsync('summary.enabledNotOperatingLog', { type: 'state', common: { name: 'Log of enabled but not operating instances', type: 'string', role: 'json', read: true, write: false, def: '[]' }, native: {} });
+            await this.setObjectNotExistsAsync('summary.enoList', { type: 'state', common: { name: 'List: Enabled but not operating instances', type: 'array', role: 'info', read: true, write: false, def: '[]' }, native: {} });
+            if (this.config.maxlog_summary) await this.setObjectNotExistsAsync('summary.enoSummaryLog', { type: 'state', common: { name: 'Log of enabled but not operating instances', type: 'string', role: 'json', read: true, write: false, def: '[]' }, native: {} });
             await this.setObjectNotExistsAsync('info.updatedDate', { type: 'state', common: { name: 'Last update', type: 'number', role: 'date', read: true, write: false, def: 0 }, native: {} });
 
             // Create adapter instance device and state objects
@@ -564,21 +577,26 @@ export class InstanceWatcher extends utils.Adapter {
              * Cleanup: Delete summary log state if deactivated in instance config
              */
             if (!this.config.maxlog_summary) {
-                if (await this.getObjectAsync('summary.enabledNotOperatingLog')) {
-                    await this.delObjectAsync('summary.enabledNotOperatingLog', { recursive: false });
+                if (await this.getObjectAsync('summary.enoSummaryLog')) {
+                    await this.delObjectAsync('summary.enoSummaryLog', { recursive: false });
+                    this.log.info(`Object summary.enoSummaryLog deleted, as log in config was deactivated.`);
                 }
             }
 
             /**
-             * Cleanup: Delete instance log state if deactivated in instance config
+             * Cleanup: Delete instance log states if deactivated in instance config
              */
             if (!this.config.maxlog_inst) {
+                let counter = 0;
                 for (const id of this._inst.list) {
-                    const path = 'instances.' + id;
-                    if (await this.getObjectAsync(path + '.logEnabledNotOperating')) {
-                        await this.delObjectAsync(path + '.logEnabledNotOperating', { recursive: false });
+                    const fullObjId = 'instances.' + id + '.logEnabledNotOperating';
+                    if (await this.getObjectAsync(fullObjId)) {
+                        counter++;
+                        await this.delObjectAsync(fullObjId, { recursive: false });
+                        this.log.debug(`Object ${fullObjId} deleted, as log in config was deactivated.`);
                     }
                 }
+                if (counter > 0) this.log.info(`${counter} instances objects .logEnabledNotOperating deleted, as log in config was deactivated.`);
             }
 
             /**
